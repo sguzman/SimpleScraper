@@ -45,6 +45,7 @@ namespace net {
 
 int main() noexcept {
   static std::thread ts[cores];
+  cpp_redis::client client;
 
   for (unsigned short i{0}; i < cores; ++i) {
     ts[i] = std::thread{net::threadLogic, i + 1};

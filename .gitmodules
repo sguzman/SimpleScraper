@@ -1,12 +1,3 @@
 [submodule "cpr"]
 	path = cpr
 	url = http://github.com/whoshuu/cpr.git
-[submodule "brotli"]
-	path = brotli
-	url = https://github.com/google/brotli
-[submodule "cpp_redis"]
-	path = cpp_redis
-	url = https://github.com/Cylix/cpp_redis
-[submodule "gumbo-query"]
-	path = gumbo-query
-	url = https://github.com/lazytiger/gumbo-query
