@@ -27,7 +27,7 @@ static inline void links(const unsigned short i) noexcept {
   CDocument doc;
   doc.parse(html);
 
-  CSelection c = doc.find("html > body > main#main > div.container-outer > div.container > div.content > div.content-inner.standard-view > article");
+  CSelection c = doc.find("main#main > div.container-outer > div.container > div.content > div.content-inner.standard-view > article");
   std::cout << "On page " << i << std::endl;
   for (auto&& j = 0u; j < c.nodeNum(); j++) {
     std::cout << c.nodeAt(j).childAt(1).childAt(3).childAt(1).childAt(1).childAt(1).attribute("href") << std::endl;
