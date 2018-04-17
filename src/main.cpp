@@ -29,7 +29,6 @@ static inline void links(const unsigned short i) noexcept {
 
   CSelection c = doc.find("html > body > main#main > div.container-outer > div.container > div.content > div.content-inner.standard-view > article");
   std::cout << "On page " << i << std::endl;
-  std::cout << "Children " << c.nodeNum() << std::endl;
   for (auto&& j = 0u; j < c.nodeNum(); j++) {
     std::cout << c.nodeAt(j).childAt(1).childAt(3).childAt(1).childAt(1).childAt(1).attribute("href") << std::endl;
   }
@@ -42,7 +41,7 @@ static inline void threadLogic(const unsigned short start) noexcept {
 }
 
 int main() noexcept {
-  static std::thread ts[4];
+  static std::thread ts[cores];
 
   for (unsigned short i{0}; i < cores; ++i) {
     ts[i] = std::thread{threadLogic, i + 1};
