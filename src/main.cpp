@@ -4,7 +4,7 @@
 #include <gq/Node.h>
 #include <gq/Document.h>
 
-constexpr static const unsigned short cores = 4;
+constexpr static const unsigned short cores = 8;
 constexpr static const unsigned short maxPage = 1263;
 constexpr static const char base[]{"https://it-eb.com/page/"};
 
