@@ -15,4 +15,4 @@ link_directories(/usr/local/lib)
 
 target_link_libraries(scrape cpp_redis)
 target_link_libraries(scrape gq)
-target_link_libraries(scrape brotli)
+target_link_libraries(scrape brotlienc)
