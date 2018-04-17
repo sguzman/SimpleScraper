@@ -1,9 +1,6 @@
 [submodule "cpr"]
 	path = cpr
 	url = http://github.com/whoshuu/cpr.git
-[submodule "myhtml"]
-	path = myhtml
-	url = https://github.com/lexborisov/myhtml
 [submodule "brotli"]
 	path = brotli
 	url = https://github.com/google/brotli
