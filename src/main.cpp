@@ -13,6 +13,8 @@ namespace globals {
   constexpr static const unsigned short maxPage = 1263;
   constexpr static const char base[]{"https://it-eb.com/page/"};
   constexpr static const char redisHashName[]{"ebooks"};
+  static std::thread ts[globals::cores];
+  cpp_redis::client client;
 }
 
 namespace net {
@@ -159,11 +161,9 @@ static inline const std::unordered_map<std::string, std::string> map(cpp_redis::
 }
 
 int main() noexcept {
-  static std::thread ts[globals::cores];
-  cpp_redis::client client;
-  client.connect();
+  globals::client.connect();
 
-  auto hash = map(client);
+  const auto& hash = map(globals::client);
   print(hash) << std::endl;
 
   return EXIT_SUCCESS;
