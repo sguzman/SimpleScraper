@@ -15,6 +15,9 @@ include_directories(${CPR_INCLUDE_DIRS})
 include_directories(${BROTLI_INCLUDE_DIRS})
 
 add_executable(scrape src/main.cpp)
+
 target_link_libraries(scrape ${CPR_LIBRARIES})
 target_link_libraries(scrape ${BROTLI_LIBRARIES})
 
+link_directories(/usr/local/lib)
+target_link_libraries(scrape gq)
