@@ -6,6 +6,7 @@
 #include <gq/Document.h>
 #include <cpp_redis/cpp_redis>
 #include <brotli/encode.h>
+#include <brotli/decode.h>
 
 namespace globals {
   constexpr static const unsigned short cores = 8;
