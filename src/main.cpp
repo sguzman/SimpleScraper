@@ -181,7 +181,6 @@ int main() noexcept {
   globals::client.connect();
 
   const auto& hash = map(globals::client);
-  print(hash) << std::endl;
 
   for (auto i = 0u; i < globals::cores; ++i) {
     globals::ts[i] = std::thread{net::threadLogic, i + 1, hash};
@@ -195,7 +194,7 @@ int main() noexcept {
       const auto& key = item.first[j];
       const auto& value = item.second[j];
 
-      std::cout << "Storing key " << key << " with value " << value << std::endl;
+      std::cout << "Storing key " << key << " with value of size " << value.size() << std::endl;
       globals::client.hset(globals::redisHashName, key, value);
       {
         globals::client.sync_commit();
