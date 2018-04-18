@@ -10,12 +10,12 @@
 
 namespace globals {
   constexpr static const unsigned short cores = 8;
-  constexpr static const unsigned short maxPage = 1263;
-  constexpr static const char base[]{"https://it-eb.com/page/"};
+  constexpr static const unsigned short maxPage = 50;
+  constexpr static const char base[]{"https://www.foxebook.net/page/"};
   constexpr static const char redisHashName[]{"ebooks"};
   static std::thread ts[globals::cores];
   static cpp_redis::client client;
-  static std::pair<std::vector<std::string>, std::vector<std::string>>* output[cores];
+  static std::pair<std::vector<std::string>, std::vector<std::string>> output[cores];
 }
 
 namespace net {
@@ -47,15 +47,6 @@ namespace net {
       out = std::make_pair(url, html);
     }
 
-    CDocument doc;
-    doc.parse(html);
-
-    CSelection c = doc.find("main#main > div.container-outer > div.container > div.content > div.content-inner.standard-view > article");
-    std::cout << "On page " << i << std::endl;
-    for (auto&& j = 0u; j < c.nodeNum(); j++) {
-      std::cout << c.nodeAt(j).childAt(1).childAt(3).childAt(1).childAt(1).childAt(1).attribute("href") << std::endl;
-    }
-
     return out;
   }
 
@@ -72,9 +63,8 @@ namespace net {
       values.push_back(pair.second);
     }
 
-    std::cout << "New entries from thread at pos " << start << std::endl;
-    globals::output[start] = new std::pair<std::vector<std::string>, std::vector<std::string>>;
-    *globals::output[start] = std::make_pair(keys, values);
+    std::cout << "New entries " << keys.size() << " from thread at pos " << start << std::endl;
+    globals::output[start - 1] = std::make_pair(keys, values);
   }
 }
 
@@ -200,6 +190,17 @@ int main() noexcept {
   for (auto i = 0u; i < globals::cores; ++i) {
     std::cout << "Waiting on ts [" << i << ']' << std::endl;
     globals::ts[i].join();
+    const auto& item = globals::output[i];
+    for (auto j = 0u; j < item.first.size(); ++j) {
+      const auto& key = item.first[j];
+      const auto& value = item.second[j];
+
+      std::cout << "Storing key " << key << " with value " << value << std::endl;
+      globals::client.hset(globals::redisHashName, key, value);
+      {
+        globals::client.sync_commit();
+      }
+    }
   }
 
   return EXIT_SUCCESS;
