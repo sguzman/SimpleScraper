@@ -14,7 +14,8 @@ namespace globals {
   constexpr static const char base[]{"https://it-eb.com/page/"};
   constexpr static const char redisHashName[]{"ebooks"};
   static std::thread ts[globals::cores];
-  cpp_redis::client client;
+  static cpp_redis::client client;
+  static std::pair<std::vector<std::string>, std::vector<std::string>>* output[cores];
 }
 
 namespace net {
@@ -31,8 +32,20 @@ namespace net {
     return get(page(num).c_str());
   }
 
-  static inline void links(const unsigned short i) noexcept {
-    const auto&& html = getPage(i);
+  static inline const std::pair<std::string, std::string> links(const unsigned short i, std::unordered_map<std::string, std::string> umap) noexcept {
+    const auto& url = page(i);
+
+    std::string html;
+
+    std::pair<std::string, std::string> out{std::make_pair("", "")};
+    if (umap.find(url) != umap.cend()) {
+      std::cout << "Hit Http Cache for key " << url << std::endl;
+      html = umap[url];
+    } else {
+      std::cout << "Miss Http Cache for key " << url << std::endl;
+      html = getPage(i);
+      out = std::make_pair(url, html);
+    }
 
     CDocument doc;
     doc.parse(html);
@@ -42,12 +55,26 @@ namespace net {
     for (auto&& j = 0u; j < c.nodeNum(); j++) {
       std::cout << c.nodeAt(j).childAt(1).childAt(3).childAt(1).childAt(1).childAt(1).attribute("href") << std::endl;
     }
+
+    return out;
   }
 
-  static inline void threadLogic(const unsigned short start) noexcept {
+  static inline void threadLogic(const unsigned short start, std::unordered_map<std::string, std::string> umap) noexcept {
+    std::vector<std::string> keys{};
+    std::vector<std::string> values{};
     for (unsigned short i{start}; i < globals::maxPage; i += globals::cores) {
-      links(i);
+      const auto pair = links(i, umap);
+      if (pair.first.empty()) {
+        continue;
+      }
+
+      keys.push_back(pair.first);
+      values.push_back(pair.second);
     }
+
+    std::cout << "New entries from thread at pos " << start << std::endl;
+    globals::output[start] = new std::pair<std::vector<std::string>, std::vector<std::string>>;
+    *globals::output[start] = std::make_pair(keys, values);
   }
 }
 
@@ -165,6 +192,15 @@ int main() noexcept {
 
   const auto& hash = map(globals::client);
   print(hash) << std::endl;
+
+  for (auto i = 0u; i < globals::cores; ++i) {
+    globals::ts[i] = std::thread{net::threadLogic, i + 1, hash};
+  }
+
+  for (auto i = 0u; i < globals::cores; ++i) {
+    std::cout << "Waiting on ts [" << i << ']' << std::endl;
+    globals::ts[i].join();
+  }
 
   return EXIT_SUCCESS;
 }
